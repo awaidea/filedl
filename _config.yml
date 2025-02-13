@@ -1,0 +1,7 @@
+site:
+  title: "下载站"  # 站点标题
+
+theme:
+  navbar_color: "#40E0D0"  # 导航栏配色
+  primary_color: "#3F51B5"  # 主题主色 (深蓝)
+  accent_color: "#E91E63"    # 主题强调色 (粉色)
