@@ -1,0 +1,29 @@
+{
+    "downloads": [
+        {
+            "name": "示例文档.pdf",
+            "description": "这是一个 PDF 文件示例。",
+            "link": "files/example.pdf"
+        },
+        {
+            "name": "示例图片.jpg",
+            "description": "这是一个 JPG 文件示例。",
+            "link": "files/example.jpg"
+        },
+        {
+            "name": "示例压缩包.zip",
+            "description": "这是一个 ZIP 文件示例。",
+            "link": "files/example.zip"
+        },
+        {
+            "name": "示例文本.txt",
+            "description": "这是一个 TXT 文件示例。",
+            "link": "files/example.txt"
+        },
+        {
+            "name": "未知文件类型.xyz",
+            "description": "这是一个未知文件类型的示例。",
+            "link": "files/example.xyz"
+        }
+    ]
+}
