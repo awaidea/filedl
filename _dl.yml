@@ -1,0 +1,13 @@
+downloads:
+  - name: "文件 1"
+    description: "这是文件 1 的描述。"
+    link: "path/to/your/file1.zip"
+    background: "url('path/to/your/background1.jpg')"
+  - name: "文件 2"
+    description: "这是文件 2 的描述。"
+    link: "path/to/your/file2.zip"
+    background: "url('path/to/your/background2.jpg')"
+  - name: "文件 3"
+    description: "这是文件 3 的描述。"
+    link: "path/to/your/file3.zip"
+    background: "url('path/to/your/background3.jpg')"
