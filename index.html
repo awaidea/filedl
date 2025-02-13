@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="site-title"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.0/dist/css/mdui.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.0/dist/js/mdui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script> <!-- 加载 js-yaml 库 -->
+    <style>
+        .custom-appbar {
+            background-color: var(--navbar-color); /* 导航栏颜色 */
+        }
+        .custom-appbar .mdui-toolbar a {
+            color: white; /* 设置导航栏字体颜色为白色 */
+        }
+        #search-container {
+            display: flex;
+            align-items: center;
+        }
+        #search-input {
+            width: 100px; /* 默认缩略宽度 */
+            transition: width 0.3s; /* 添加过渡效果 */
+            margin-left: 5px; /* 图标和输入框之间的间距 */
+        }
+        #search-input:focus {
+            width: 200px; /* 获得焦点时的宽度 */
+        }
+        .file-icon {
+            margin-right: 10px; /* 文件图标和文件名之间的间距 */
+            font-size: 1.5em; /* 文件图标大小 */
+            color: var(--navbar-color); /* 文件图标颜色 */
+        }
+        .mdui-card {
+            background-size: cover; /* 背景图像覆盖整个卡片 */
+            background-position: center; /* 背景图像居中 */
+            color: white; /* 卡片文字颜色 */
+        }
+        .mdui-card-header-title,
+        .mdui-card-content {
+            text-align: left; /* 正文区域文字左对齐 */
+        }
+    </style>
+</head>
+<body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
+
+    <div class="mdui-appbar custom-appbar">
+        <div class="mdui-appbar-inner">
+            <div class="mdui-toolbar">
+                <a href="javascript:;" class="mdui-typo-headline" id="navbar-title"></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <div id="search-container">
+                    <i class="fas fa-search" style="color: white;"></i> <!-- 搜索图标 -->
+                    <input type="text" id="search-input" class="mdui-textfield-input" placeholder="搜索文件..." oninput="filterFiles()" onfocus="this.style.width='200px'" onblur="this.style.width='100px'">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mdui-container" id="file-list">
+        <h2 class="mdui-text-center">欢迎来到下载站</h2>
+        <div class="mdui-row" id="files">
+            <!-- 文件列表将通过 JavaScript 动态加载 -->
+        </div>
+    </div>
+
+    <script>
+        async function loadConfig() {
+            const response = await fetch('_config.yml');
+            const yamlText = await response.text();
+            const config = jsyaml.load(yamlText); // 解析 YAML 数据
+
+            // 设置站点标题和配色
+            document.getElementById('site-title').innerText = config.site.title;
+            document.getElementById('navbar-title').innerText = config.site.title;
+            document.documentElement.style.setProperty('--navbar-color', config.theme.navbar_color);
+            document.documentElement.style.setProperty('--primary-color', config.theme.primary_color);
+            document.documentElement.style.setProperty('--accent-color', config.theme.accent_color);
+        }
+
+        async function loadFiles() {
+            // 从 _dl.yml 文件加载数据
+            const response = await fetch('_dl.yml');
+            const yamlText = await response.text();
+            const parsedData = jsyaml.load(yamlText); // 解析 YAML 数据
+
+            const filesContainer = document.getElementById('files');
+            parsedData.downloads.forEach(file => {
+                const fileCard = `
+                    <div class="mdui-col-xs-12 mdui-col-md-6 mdui-col-lg-4">
+                        <div class="mdui-card" style="background-image: ${file.background};">
+                            <div class="mdui-card-header">
+                                <div class="mdui-card-header-title">
+                                    <i class="fas fa-file file-icon"></i>
+                                    ${file.name}
+                                </div>
+                            </div>
+                            <div class="mdui-card-content">
+                                ${file.description}
+                            </div>
+                            <div class="mdui-card-actions">
+                                <a href="${file.link}" class="mdui-btn mdui-btn-raised mdui-ripple">下载</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                filesContainer.innerHTML += fileCard;
+            });
+        }
+
+        // 搜索文件
+        function filterFiles() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const filesContainer = document.getElementById('files');
+            filesContainer.innerHTML = ''; // 清空当前文件列表
+
+            const filteredFiles = parsedData.downloads.filter(file => 
+                file.name.toLowerCase().includes(searchInput) || 
+                file.description.toLowerCase().includes(searchInput)
+            );
+
+            filteredFiles.forEach(file => {
+                const fileCard = `
+                    <div class="mdui-col-xs-12 mdui-col-md-6 mdui-col-lg-4">
+                        <div class="mdui-card" style="background-image: ${file.background};">
+                            <div class="mdui-card-header">
+                                <div class="mdui-card-header-title">
+                                    <i class="fas fa-file file-icon"></i>
+                                    ${file.name}
+                                </div>
+                            </div>
+                            <div class="mdui-card-content">
+                                ${file.description}
+                            </div>
+                            <div class="mdui-card-actions">
+                                <a href="${file.link}" class="mdui-btn mdui-btn-raised mdui-ripple">下载</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                filesContainer.innerHTML += fileCard;
+            });
+        }
+
+        // 页面加载时调用
+        window.onload = async () => {
+            await loadConfig();
+            await loadFiles();
+        };
+    </script>
+
+</body>
+</html>
