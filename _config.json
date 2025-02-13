@@ -1,4 +1,9 @@
 {
     "title": "我的下载站",
-    "navbar_color": "#1976D2"
+    "navbar_color": "#1976D2",
+    "webdav": {
+        "url": "https://your-cloudreve-server/webdav/",  // WebDAV 服务器地址
+        "username": "your_username",                       // WebDAV 用户名
+        "password": "your_password"                        // WebDAV 密码
+    }
 }
