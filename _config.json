@@ -2,8 +2,8 @@
     "title": "我的下载站",
     "navbar_color": "#1976D2",
     "webdav": {
-        "url": "https://your-cloudreve-server/webdav/",  // WebDAV 服务器地址
-        "username": "your_username",                       // WebDAV 用户名
-        "password": "your_password"                        // WebDAV 密码
+        "url": "https://pan.moe/dav",  // WebDAV 服务器地址
+        "username": "dr19830208@163.com",                       // WebDAV 用户名
+        "password": "KAA6b0ZDOvqpVquh1Kt7WpminY0J7eg9"                        // WebDAV 密码
     }
 }
