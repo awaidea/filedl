@@ -142,24 +142,43 @@
 
                 document.getElementById('site-title').innerText = config.title;
                 document.getElementById('navbar').style.backgroundColor = config.navbar_color; // 设置导航栏颜色
+                return config.webdav; // 返回 WebDAV 配置信息
             } catch (error) {
                 console.error('加载配置文件失败:', error);
             }
         }
 
         // 加载下载文件
-        async function loadFiles() {
+        async function loadFiles(webdavConfig) {
             document.getElementById('loading').style.display = 'flex'; // 显示加载动画
             try {
-                const response = await fetch('_dl.json');
+                const response = await fetch(webdavConfig.url, {
+                    method: 'PROPFIND',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${webdavConfig.username}:${webdavConfig.password}`),
+                        'Content-Type': 'text/xml; charset="utf-8"',
+                        'Depth': '1'
+                    }
+                });
+
                 if (!response.ok) throw new Error('网络错误');
-                const parsedData = await response.json();
+
+                // 假设 WebDAV 返回的是一个 XML 格式的文件列表
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "application/xml");
 
                 const filesContainer = document.getElementById('files');
                 filesContainer.innerHTML = ''; // 清空之前的内容
 
-                parsedData.downloads.forEach(file => {
-                    const extension = file.link.split('.').pop().toLowerCase(); // 获取文件扩展名
+                // 解析 XML 获取文件信息
+                const fileElements = xmlDoc.getElementsByTagName('d:response');
+                for (let i = 0; i < fileElements.length; i++) {
+                    const fileName = fileElements[i].getElementsByTagName('d:href')[0].textContent.split('/').pop();
+                    const fileDescription = "这是一个文件"; // 你可以根据需要自定义描述
+                    const fileLink = fileElements[i].getElementsByTagName('d:href')[0].textContent;
+
+                    const extension = fileName.split('.').pop().toLowerCase(); // 获取文件扩展名
                     const icon = getFileIcon(extension); // 获取对应图标
 
                     const fileCard = `
@@ -168,20 +187,20 @@
                                 <div class="mdui-card-header">
                                     <div class="mdui-card-header-title">
                                         <i class="mdui-icon material-icons file-icon">${icon}</i>
-                                        ${file.name}
+                                        ${fileName}
                                     </div>
                                 </div>
                                 <div class="mdui-card-content">
-                                    ${file.description}
+                                    ${fileDescription}
                                 </div>
                                 <div class="mdui-card-actions">
-                                    <a href="${file.link}" class="mdui-btn mdui-btn-raised mdui-ripple">下载</a>
+                                    <a href="${fileLink}" class="mdui-btn mdui-btn-raised mdui-ripple">下载</a>
                                 </div>
                             </div>
                         </div>
                     `;
                     filesContainer.innerHTML += fileCard;
-                });
+                }
             } catch (error) {
                 console.error('加载下载项失败:', error);
             } finally {
@@ -212,9 +231,9 @@
         });
 
         // 页面加载时调用
-        window.onload = function() {
-            loadConfig();
-            loadFiles();
+        window.onload = async function() {
+            const webdavConfig = await loadConfig();
+            await loadFiles(webdavConfig);
         };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mdui/1.0.2/js/mdui.min.js"></script>
